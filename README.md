@@ -333,7 +333,8 @@ git push -u origin main
 
 ### Use to make project structure
 ```bash
-cd my_project
+mkdir your_project
+cd your_project
 cookiecutter https://github.com/your-username/drf-project-template.git
 ```
 
