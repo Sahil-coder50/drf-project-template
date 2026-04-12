@@ -18,9 +18,6 @@ cookiecutter --version
 ```
 
 ## Step 3: Create Template Structure
-
-```bash
-```
 drf-project-template
 ├── README.md
 ├── cookiecutter.json
@@ -54,6 +51,7 @@ drf-project-template
         ├── local.txt
         └── production.txt
 
-```
+```bash
+
 ```
 
