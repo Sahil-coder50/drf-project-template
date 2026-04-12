@@ -18,6 +18,8 @@ cookiecutter --version
 ```
 
 ## Step 3: Create Template Structure
+
+### Structure
 ```text
 drf-project-template
 ├── cookiecutter.json
@@ -51,6 +53,12 @@ drf-project-template
         ├── local.txt
         └── production.txt
 
+```
+### Commands for making the Structure
+
+```bash
+mkdir -p "{{cookiecutter.project_slug}}"/{apps,common/{pagination,permissions,utils},config/settings,docker,requirements} && \
+touch cookiecutter.json "{{cookiecutter.project_slug}}"/{manage.py,.env,.gitignore,apps/__init__.py,common/__init__.py,common/pagination/__init__.py,common/permissions/__init__.py,common/utils/__init__.py,config/__init__.py,config/asgi.py,config/urls.py,config/wsgi.py,config/settings/{__init__.py,base.py,local.py,production.py},docker/{Dockerfile,docker-compose.yml},requirements/{base.txt,local.txt,production.txt}}
 ```
 
 ## Step 4: cookiecutter.json
@@ -321,9 +329,15 @@ git branch -M main
 git push -u origin main
 ```
 
-## Step 13: 
+## Step 13: Use to make Project Structure
 
+### Use to make project structure
 ```bash
 cd my_project
 cookiecutter https://github.com/your-username/drf-project-template.git
+```
+
+### Use to add additional app in the project
+```bash
+cookiecutter https://github.com/your-username/drf-app-template.git
 ```
