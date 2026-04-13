@@ -28,8 +28,17 @@ drf-project-template
     │   └── __init__.py
     ├── common
     │   ├── __init__.py
-    │   ├── pagination
+    │   ├── exceptions
+    │   │   ├── __init__.py
+    │   │   ├── base.py
+    │   │   ├── errors.py
+    │   │   └── handlers.py
+    │   ├── mixins
     │   │   └── __init__.py
+    │   ├── pagination
+    │   │   ├── __init__.py
+    │   │   ├── standard_cursor_pagination.py
+    │   │   └── standard_pagination.py
     │   ├── permissions
     │   │   └── __init__.py
     │   └── utils
@@ -48,6 +57,7 @@ drf-project-template
     │   ├── Dockerfile
     │   └── docker-compose.yml
     ├── manage.py
+    ├── media
     └── requirements
         ├── base.txt
         ├── local.txt
@@ -57,8 +67,8 @@ drf-project-template
 ### Commands for making the Structure
 
 ```bash
-mkdir -p "{{cookiecutter.project_slug}}"/{apps,common/{pagination,permissions,utils},config/settings,docker,requirements} && \
-touch cookiecutter.json "{{cookiecutter.project_slug}}"/{manage.py,.env,.gitignore,apps/__init__.py,common/__init__.py,common/pagination/__init__.py,common/permissions/__init__.py,common/utils/__init__.py,config/__init__.py,config/asgi.py,config/urls.py,config/wsgi.py,config/settings/{__init__.py,base.py,local.py,production.py},docker/{Dockerfile,docker-compose.yml},requirements/{base.txt,local.txt,production.txt}}
+mkdir -p "{{cookiecutter.project_slug}}"/{apps,common/{exceptions,mixins,pagination,permissions,utils},config/settings,docker,requirements} && \
+touch cookiecutter.json "{{cookiecutter.project_slug}}"/{manage.py,.env,.gitignore,apps/__init__.py,common/__init__.py,common/exceptions/{__init__.py,base.py,errors.py,handlers.py},common/pagination/{__init__.py,standard_cursor_pagination.py,standard_pagination.py},common/mixins/__init__.py,common/permissions/__init__.py,common/utils/__init__.py,config/__init__.py,config/asgi.py,config/urls.py,config/wsgi.py,config/settings/{__init__.py,base.py,local.py,production.py},docker/{Dockerfile,docker-compose.yml},requirements/{base.txt,local.txt,production.txt}}
 ```
 
 ## Step 4: cookiecutter.json
@@ -100,7 +110,89 @@ if __name__ == '__main__':
 
 ```
 
-## Step 6: Settings
+## Step 6: Exceptions
+
+### common/exceptions/handlers.py
+
+```bash
+import logging
+from rest_framework.views import exception_handler
+from rest_framework.exceptions import APIException
+
+logger = logging.getLogger(__name__)
+def custom_exception_handler(exc, context):
+    # Call the default DRF exception handler first
+    response = exception_handler(exc, context)
+    # Log the exception with context
+    logger.error(
+        f"Exception: {exc.__class__.__name__} - {str(exc)}",
+        extra={"request": context["request"], "view": context["view"]}
+    )
+    if response is not None:
+        # Add more structured data to the response
+        response.data = {
+            "status_code": response.status_code,
+            "error": response.data.get("detail", "An error occurred"),
+            "exception": exc.__class__.__name__,
+            "view": context["view"].__class__.__name__,
+            "method": context["request"].method,
+            "path": context["request"].path,
+        }
+    return response
+
+```
+## Step 7: Pagination
+
+### common/pagination/standard_pagination.py
+
+```bash
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
+
+class StandardPagination(PageNumberPagination):
+    page_size = 20
+    page_size_query_param = "page_size"
+    max_page_size = 100
+
+    def get_paginated_response(self, data):
+        return Response({
+            "status": "success",
+            "pagination": {
+                "total_records": self.page.paginator.count,
+                "total_pages": self.page.paginator.num_pages,
+                "current_page": self.page.number,
+                "page_size": self.get_page_size(self.request),
+                "next": self.get_next_link(),
+                "previous": self.get_previous_link(),
+            },
+            "results": data,
+        })
+
+```
+
+### common/pagination/standard_cursor_pagination.py
+
+```bash
+from rest_framework.pagination import CursorPagination
+from rest_framework.response import Response
+
+class StandardCursorPagination(CursorPagination):
+    page_size = 20
+    ordering = ("-created_at", "-id")
+
+    def get_paginated_response(self, data):
+        return Response({
+            "status": "success",
+            "pagination": {
+                'next': self.get_next_link(),
+                'previous': self.get_previous_link(),
+            },
+            'results': data,
+        })
+
+```
+
+## Step 8: Settings
 
 ### settings/base.py
 
@@ -134,6 +226,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
 ]
+
+REST_FRAMEWORK = {
+    "EXCEPTION_HANDLER":"common.exceptions.handlers.custom_exception_handler",
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -236,14 +332,21 @@ from .base import *
 
 DEBUG = False
 
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS')
+
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
+    'default': {
+        'ENGINE': os.getenv('DB_ENGINE'),
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': os.getenv('DB_PORT'),
     }
 }
 ```
 
-## Step 7 urls.py
+## Step 9: urls.py
 
 ```bash
 from django.contrib import admin
@@ -254,7 +357,7 @@ urlpatterns = [
 ]
 ```
 
-## Step 8: Requirements Files
+## Step 10: Requirements Files
 
 ### requirements/base.txt
 ```bash
@@ -276,15 +379,22 @@ ipython
 gunicorn
 ```
 
-## Step 9: .env File
+## Step 11: .env File
 
 ```bash
-SECRET_KEY=your-secret
-DATABASE_URL=postgres://user:pass@localhost:5432/db
+SECRET_KEY=add_secret_key
+ALLOWED_HOSTS=*
+
+DB_ENGINE=django.db.backends.postgresql
+DB_NAME=your_db_name
+DB_USER=your_db_username
+DB_PASSWORD=your_db_password
+DB_HOST=localhost
+DB_PORT=5432
 
 ```
 
-## Step 10: Docker Setup
+## Step 12: Docker Setup
 
 ### Dockerfile
 ```bash
@@ -310,7 +420,7 @@ services:
       - "8000:8000"
 ```
 
-## Step 11: .gitignore
+## Step 13: .gitignore
 
 ```bash
 __pycache__/
@@ -319,7 +429,7 @@ __pycache__/
 db.sqlite3
 ```
 
-## Step 12: Commit and Push
+## Step 14: Commit and Push
 
 ```bash
 git add .
@@ -329,7 +439,7 @@ git branch -M main
 git push -u origin main
 ```
 
-## Step 13: Use to make Project Structure
+## Step 15: Use to make Project Structure
 
 ### Use to make project structure
 ```bash
