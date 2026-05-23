@@ -34,7 +34,7 @@ services:
 
   daphne:
     build: . 
-    entrypoint: /{{cookiecutter.{{cookiecutter.project_slug}}_slug}}/entrypoint.sh
+    entrypoint: /{{cookiecutter.project_slug}}_slug}}/entrypoint.sh
     environment:
       RUN_MIGRATIONS: "0"
     command: >
