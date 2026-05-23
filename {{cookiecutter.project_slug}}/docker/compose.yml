@@ -16,7 +16,7 @@ services:
 
   gunicorn:
     build: .
-    entrypoint: /project/entrypoint.sh
+    entrypoint: /{{cookiecutter.project_slug}}/entrypoint.sh
     environment:
       RUN_MIGRATIONS: "1"
     command: >
@@ -24,7 +24,7 @@ services:
       --bind 0.0.0.0:8000
       --workers 4
     volumes:
-      - static_volume:/project/staticfiles
+      - static_volume:/{{cookiecutter.project_slug}}/staticfiles
     env_file:
       - .env
     depends_on:
@@ -34,7 +34,7 @@ services:
 
   daphne:
     build: . 
-    entrypoint: /project/entrypoint.sh
+    entrypoint: /{{cookiecutter.{{cookiecutter.project_slug}}_slug}}/entrypoint.sh
     environment:
       RUN_MIGRATIONS: "0"
     command: >
@@ -43,7 +43,7 @@ services:
       -p 8001
       config.asgi:application
     volumes:
-      - static_volume:/project/staticfiles
+      - static_volume:/{{cookiecutter.project_slug}}/staticfiles
     env_file:
       - .env
     depends_on:
@@ -54,7 +54,7 @@ services:
 
   celery_worker:
     build: .
-    entrypoint: /project/entrypoint.sh
+    entrypoint: /{{cookiecutter.project_slug}}/entrypoint.sh
     environment:
       RUN_MIGRATIONS: "0"
     command: >
@@ -70,7 +70,7 @@ services:
 
   celery_beat:
     build: .
-    entrypoint: /project/entrypoint.sh
+    entrypoint: /{{cookiecutter.project_slug}}/entrypoint.sh
     environment:
       RUN_MIGRATIONS: "0"
     command: >
@@ -90,7 +90,7 @@ services:
       - "8084:80"
     volumes:
      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-     - static_volume:/project/staticfiles
+     - static_volume:/{{cookiecutter.project_slug}}/staticfiles
     depends_on:
      - gunicorn
      - daphne
