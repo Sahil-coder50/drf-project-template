@@ -24,7 +24,7 @@ cookiecutter --version
 drf-project-template
 ├── cookiecutter.json
 └── {{cookiecutter.project_slug}}
-    ├── apps
+    ├── modules
     │   └── __init__.py
     ├── common
     │   ├── __init__.py
@@ -67,8 +67,8 @@ drf-project-template
 ### Commands for making the Structure
 
 ```bash
-mkdir -p "{{cookiecutter.project_slug}}"/{apps,common/{exceptions,mixins,pagination,permissions,utils},config/settings,docker,requirements} && \
-touch cookiecutter.json "{{cookiecutter.project_slug}}"/{manage.py,.env,.gitignore,apps/__init__.py,common/__init__.py,common/exceptions/{__init__.py,base.py,errors.py,handlers.py},common/pagination/{__init__.py,standard_cursor_pagination.py,standard_pagination.py},common/mixins/__init__.py,common/permissions/__init__.py,common/utils/__init__.py,config/__init__.py,config/asgi.py,config/urls.py,config/wsgi.py,config/settings/{__init__.py,base.py,local.py,production.py},docker/{Dockerfile,docker-compose.yml},requirements/{base.txt,local.txt,production.txt}}
+mkdir -p "{{cookiecutter.project_slug}}"/{modules,common/{exceptions,mixins,pagination,permissions,utils},config/settings,docker,requirements} && \
+touch cookiecutter.json "{{cookiecutter.project_slug}}"/{manage.py,.env,.gitignore,modules/__init__.py,common/__init__.py,common/exceptions/{__init__.py,base.py,errors.py,handlers.py},common/pagination/{__init__.py,standard_cursor_pagination.py,standard_pagination.py},common/mixins/__init__.py,common/permissions/__init__.py,common/utils/__init__.py,config/__init__.py,config/asgi.py,config/urls.py,config/wsgi.py,config/settings/{__init__.py,base.py,local.py,production.py},docker/{Dockerfile,docker-compose.yml},requirements/{base.txt,local.txt,production.txt}}
 ```
 
 ## Step 4: cookiecutter.json
