@@ -11,7 +11,7 @@ app.config_from_object(
     namespace="CELERY"
 )
 
-app.autodicover_tasks()
+app.autodiscover_tasks()
 
 @setup_logging.connect
 def config_loggers(*args, **kwargs):

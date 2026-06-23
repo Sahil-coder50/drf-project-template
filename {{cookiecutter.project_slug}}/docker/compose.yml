@@ -38,6 +38,7 @@ services:
     entrypoint: /{{cookiecutter.project_slug}}/docker/entrypoint.sh
     environment:
       RUN_MIGRATIONS: "1"
+      DJANGO_SETTINGS_MODULE: config.settings.production
     command: >
       gunicorn config.asgi:application
       -k uvicorn.workers.UvicornWorker
@@ -95,7 +96,7 @@ services:
     ports:
       - "8084:80"
     volumes:
-     - ../nginx/nginx.conf:/etc/nginx/nginx.conf
+     - ../docker/nginx.conf:/etc/nginx/nginx.conf
      - static_volume:/{{cookiecutter.project_slug}}/staticfiles
     depends_on:
       web:
