@@ -1,0 +1,58 @@
+# Start all services
+up:
+    docker compose -f docker/compose.yml up -d
+
+# Stop all services
+down:
+    docker compose -f docker/compose.yml down
+
+# Stop containers and remove volumes
+clean:
+    docker compose -f docker/compose.yml down -v
+
+# Stop containers, remove volumes and images built by Compose
+purge:
+    docker compose -f docker/compose.yml down -v --rmi local
+
+# View logs
+logs:
+    docker compose -f docker/compose.yml logs -f
+
+# Build images
+build:
+    docker compose -f docker/compose.yml build
+
+# Create new migrations
+makemigrations:
+    docker compose -f docker/compose.yml run --rm web python manage.py makemigrations
+
+# Apply migrations
+migrate:
+    docker compose -f docker/compose.yml run --rm web python manage.py migrate
+
+# Create a superuser
+superuser:
+    docker compose -f docker/compose.yml run --rm web python manage.py createsuperuser
+
+# Django shell
+shell:
+    docker compose -f docker/compose.yml run --rm web python manage.py shell
+
+# Django management command
+manage *args:
+    docker compose -f docker/compose.yml run --rm web python manage.py {{args}}
+
+# Run tests
+test:
+    docker compose -f docker/compose.yml run --rm web python manage.py test
+
+# Collect static files
+collectstatic:
+    docker compose -f docker/compose.yml run --rm web python manage.py collectstatic --noinput
+
+# Bootstrap a new environment
+bootstrap:
+    docker compose -f docker/compose.yml up -d postgres_db redis
+    docker compose -f docker/compose.yml run --rm web python manage.py migrate
+    docker compose -f docker/compose.yml run --rm web python manage.py createsuperuser
+    docker compose -f docker/compose.yml up -d

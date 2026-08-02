@@ -37,7 +37,6 @@ services:
       start_period: 30s
     entrypoint: /{{cookiecutter.project_slug}}/docker/entrypoint.sh
     environment:
-      RUN_MIGRATIONS: "1"
       DJANGO_SETTINGS_MODULE: config.settings.production
     command: >
       gunicorn config.asgi:application
@@ -60,8 +59,6 @@ services:
       context: ..
       dockerfile: docker/dockerfile
     entrypoint: /{{cookiecutter.project_slug}}/docker/entrypoint.sh
-    environment:
-      RUN_MIGRATIONS: "0"
     command: >
       celery -A config worker
       --loglevel=info
@@ -78,8 +75,6 @@ services:
       context: ..
       dockerfile: docker/dockerfile
     entrypoint: /{{cookiecutter.project_slug}}/docker/entrypoint.sh
-    environment:
-      RUN_MIGRATIONS: "0"
     command: >
       celery -A config beat
       --loglevel=info

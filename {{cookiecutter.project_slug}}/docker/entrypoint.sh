@@ -9,10 +9,4 @@ done
 
 echo "PostgreSQL started"
 
-if [ "$RUN_MIGRATIONS" = "1" ]; then
-  echo "Running migrations..."
-  python manage.py migrate --noinput
-  python manage.py collectstatic --noinput
-fi
-
 exec "$@"
