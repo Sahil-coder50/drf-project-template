@@ -38,9 +38,11 @@ superuser:
 shell:
     docker compose -f docker/compose.yml run --rm web python manage.py shell
 
+{% raw %}
 # Django management command
 manage *args:
     docker compose -f docker/compose.yml run --rm web python manage.py {{args}}
+{% endraw %}
 
 # Run tests
 test:
