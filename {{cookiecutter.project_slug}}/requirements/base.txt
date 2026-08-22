@@ -5,3 +5,5 @@ python-dotenv
 channels
 channels_redis
 celery
+pillow
+auth-drf
